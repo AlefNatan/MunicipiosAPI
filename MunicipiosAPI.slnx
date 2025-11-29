@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="MunicipiosAPI.Repository/MunicipiosAPI.Repository.csproj" />
+  <Project Path="MunicipiosAPI.Service/MunicipiosAPI.Service.csproj" />
+  <Project Path="MunicipiosAPI.Tests/MunicipiosAPI.Tests.csproj" />
+  <Project Path="MunicipiosAPI/MunicipiosAPI.csproj" />
+</Solution>
