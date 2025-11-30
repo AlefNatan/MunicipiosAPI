@@ -1,3 +1,7 @@
 <Solution>
+  <Project Path="MunicipiosAPI.Domain/MunicipiosAPI.Domain.csproj" />
+  <Project Path="MunicipiosAPI.Providers/MunicipiosAPI.Providers.csproj" />
+  <Project Path="MunicipiosAPI.Service/MunicipiosAPI.Service.csproj" />
+  <Project Path="MunicipiosAPI.Tests/MunicipiosAPI.Tests.csproj" />
   <Project Path="MunicipiosAPI/MunicipiosAPI.csproj" />
 </Solution>
