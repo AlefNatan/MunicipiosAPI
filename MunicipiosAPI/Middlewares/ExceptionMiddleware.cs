@@ -22,18 +22,46 @@ public class ExceptionMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Erro inesperado");
+            _logger.LogError(ex, "Unhandled exception caught by middleware.");
 
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            var (status, message) = MapExceptionToResponse(ex);
+
+            context.Response.StatusCode = status;
             context.Response.ContentType = "application/json";
 
-            var error = new
-            {
-                message = "Ocorreu um erro interno no servidor.",
-                detail = ex.Message
-            };
+            var result = JsonSerializer.Serialize(
+                new
+                {
+                    error = message,
+                    status = status
+                },
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                });
 
-            await context.Response.WriteAsync(JsonSerializer.Serialize(error));
+            await context.Response.WriteAsync(result);
         }
+    }
+
+    private static (int statusCode, string message) MapExceptionToResponse(Exception ex)
+    {
+        return ex switch
+        {
+            KeyNotFoundException => ((int)HttpStatusCode.NotFound,
+                ex.Message ?? "Recurso não encontrado."),
+
+            ArgumentException => ((int)HttpStatusCode.BadRequest,
+                ex.Message ?? "Parâmetros inválidos."),
+
+            UnauthorizedAccessException => ((int)HttpStatusCode.Unauthorized,
+                ex.Message ?? "Acesso não autorizado."),
+
+            InvalidOperationException => ((int)HttpStatusCode.Conflict,
+                ex.Message ?? "Operação inválida."),
+
+            _ => ((int)HttpStatusCode.InternalServerError,
+                "Erro interno no servidor.")
+        };
     }
 }
