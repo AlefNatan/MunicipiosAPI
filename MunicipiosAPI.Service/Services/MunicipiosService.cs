@@ -16,7 +16,7 @@ public class MunicipiosService : IMunicipiosService
         _cache = cache;
     }
 
-    public async Task<List<MunicipioResponse>> GetMunicipiosAsync(string uf)
+    public async Task<PagedResult<MunicipioResponse>> GetMunicipiosAsync(string uf, int page, int pageSize)
     {
         if (string.IsNullOrWhiteSpace(uf))
             throw new ArgumentException("UF não pode ser vazia.");
@@ -25,16 +25,32 @@ public class MunicipiosService : IMunicipiosService
 
         string cacheKey = $"municipios_{uf}";
 
-        // Tenta pegar do cache
-        if (_cache.TryGetValue(cacheKey, out List<MunicipioResponse>? cached) && cached != null)
-            return cached;
+        // Cache
+        if (!_cache.TryGetValue(cacheKey, out List<MunicipioResponse>? municipios))
+        {
+            municipios = await _provider.GetMunicipiosAsync(uf);
+            _cache.Set(cacheKey, municipios, TimeSpan.FromMinutes(10));
+        }
 
-        // Chama o provider configurado
-        var municipios = await _provider.GetMunicipiosAsync(uf);
+        int totalItems = municipios.Count;
+        int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-        // Armazena no cache por 10 minutos
-        _cache.Set(cacheKey, municipios, TimeSpan.FromMinutes(10));
+        page = Math.Max(1, page);
+        page = Math.Min(page, totalPages);
 
-        return municipios;
+        var items = municipios
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return new PagedResult<MunicipioResponse>
+        {
+            Page = page,
+            PageSize = pageSize,
+            TotalItems = totalItems,
+            TotalPages = totalPages,
+            Items = items
+        };
     }
+
 }

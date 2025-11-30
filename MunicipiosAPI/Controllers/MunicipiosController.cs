@@ -16,9 +16,13 @@ public class MunicipiosController : ControllerBase
     }
 
     [HttpGet("{uf}")]
-    public async Task<ActionResult<List<MunicipioResponse>>> Get(string uf)
+    public async Task<ActionResult<PagedResult<MunicipioResponse>>> Get(
+        string uf,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20)
     {
-        var result = await _service.GetMunicipiosAsync(uf);
+        var result = await _service.GetMunicipiosAsync(uf, page, pageSize);
         return Ok(result);
     }
+
 }
