@@ -1,0 +1,17 @@
+services:
+  webapi:
+    container_name: municipiosapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      PROVIDER_MUNICIPIOS: "IBGE_API"
+    networks:
+      - mynetwork
+    restart: always
+
+networks:
+  mynetwork:
