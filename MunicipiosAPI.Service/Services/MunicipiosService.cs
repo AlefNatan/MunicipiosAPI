@@ -23,9 +23,6 @@ public class MunicipiosService : IMunicipiosService
 
         uf = uf.Trim().ToUpper();
 
-        if (uf.Length != 2 || !uf.All(char.IsLetter))
-            throw new ArgumentException("UF inválida.");
-
         string cacheKey = $"municipios_{uf}";
 
         // Cache
@@ -34,6 +31,9 @@ public class MunicipiosService : IMunicipiosService
             municipios = await _provider.GetMunicipiosAsync(uf);
             _cache.Set(cacheKey, municipios, TimeSpan.FromMinutes(10));
         }
+
+        if (municipios is null)
+            throw new InvalidOperationException("Falha ao obter municípios.");
 
         int totalItems = municipios.Count;
         int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
