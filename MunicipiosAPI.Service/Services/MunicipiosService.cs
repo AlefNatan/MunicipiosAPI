@@ -23,6 +23,9 @@ public class MunicipiosService : IMunicipiosService
 
         uf = uf.Trim().ToUpper();
 
+        if (uf.Length != 2 || !uf.All(char.IsLetter))
+            throw new ArgumentException("UF inválida.");
+
         string cacheKey = $"municipios_{uf}";
 
         // Cache
