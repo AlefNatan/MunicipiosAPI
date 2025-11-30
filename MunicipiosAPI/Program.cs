@@ -66,6 +66,9 @@ switch (providerType)
 
 var app = builder.Build();
 
+app.MapGet("/", () => Results.Redirect("/swagger"))
+   .ExcludeFromDescription();
+
 // Swagger
 if (app.Environment.IsDevelopment())
 {
