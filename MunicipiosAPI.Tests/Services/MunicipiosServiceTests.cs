@@ -53,4 +53,25 @@ public class MunicipiosServiceTests
         result.Items[0].Name.Should().Be("CachedCity");
         _provider.Verify(p => p.GetMunicipiosAsync(It.IsAny<string>()), Times.Never);
     }
+
+    [Fact]
+    public async Task Deve_Preencher_Cache_Quando_Vazio()
+    {
+        var expected = new List<MunicipioResponse>
+    {
+        new() { Name = "CityX", IbgeCode = "777" }
+    };
+
+        _provider.Setup(p => p.GetMunicipiosAsync("SP"))
+                 .ReturnsAsync(expected);
+
+        var result = await _service.GetMunicipiosAsync("SP", 1, 10);
+
+        result.Items.Should().HaveCount(1);
+        result.Items[0].Name.Should().Be("CityX");
+
+        _cache.TryGetValue("municipios_SP", out var cached)
+              .Should().BeTrue();
+    }
+
 }
