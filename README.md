@@ -1,43 +1,75 @@
 # MunicipiosAPI
 
-A MunicipiosAPI é uma API REST desenvolvida em .NET 10 para consulta de municípios brasileiros a partir de dois providers externos: BrasilAPI e IBGE. A API implementa paginação, cache, tratamento global de exceções, testes automatizados, documentação via Swagger e está preparada para execução local ou em ambiente conteinerizado.
+A **MunicipiosAPI** é uma API REST desenvolvida em **.NET 10** para consulta de municípios brasileiros utilizando dois providers oficiais: **BrasilAPI** e **IBGE**.  
+O projeto implementa paginação, cache, tratamento global de exceções, testes automatizados, documentação via Swagger e suporte completo para execução local, em produção ou em ambiente conteinerizado.
 
-Esta API faz parte de uma solução Fullstack composta também pela aplicação frontend MunicipiosAPP (Angular), que consome este serviço.
+Esta API integra a solução fullstack composta pela aplicação frontend **MunicipiosAPP**, desenvolvida em Angular.
+
+---
 
 ## 1. Objetivo da API
 
-Fornecer um endpoint para listar municípios pertencentes a uma Unidade Federativa (UF), com possibilidade de alternância entre dois providers oficiais, seleção por variável de ambiente, resposta paginada e desempenho otimizado com uso de cache.
+Fornecer um endpoint padronizado para listar municípios de uma UF, permitindo alternância entre dois providers externos configurados via variável de ambiente, além de oferecer:
+
+- Resposta paginada  
+- Melhoria de desempenho por cache  
+- Arquitetura desacoplada (Domain, Providers, Service, API)  
+- Testes automatizados  
+- Documentação via Swagger  
+
+---
 
 ## 2. Arquitetura da Solução
 
-A API é organizada em quatro camadas principais:
+A aplicação segue uma estrutura em camadas, promovendo organização, isolamento e testabilidade.
 
-### Domain
-Contém modelos, interfaces e contratos utilizados pelas demais camadas. Mantém a base conceitual da aplicação, incluindo a entidade de resposta `MunicipioResponse`, o tipo `MunicipiosProviderType` e a abstração `IProviderMunicipios`.
+### **Domain**
+Contém modelos e contratos fundamentais:
+- `MunicipioResponse`
+- `PagedResult<T>`
+- `MunicipiosProviderType`
+- Interface `IProviderMunicipios`
 
-### Providers
-Implementa a comunicação externa com BrasilAPI e IBGE. Cada provider transforma a resposta de sua respectiva API para o modelo interno da aplicação. A seleção do provider ativo ocorre via variável de ambiente e é resolvida via injeção de dependência.
+### **Providers**
+Responsáveis por integrar com os serviços externos:
+- **BrasilAPI**
+- **IBGE**
 
-### Service
-Centraliza as regras de negócio da aplicação. Esta camada recebe a UF solicitada pelo usuário, aciona o provider configurado, aplica cache para otimização de desempenho, realiza paginação, validações e monta o objeto `PagedResult<T>` retornado ao controller. A camada de serviço é totalmente isolada da apresentação (API Web).
+Cada provider transforma sua resposta para o modelo interno.  
+A escolha do provider é feita pela variável de ambiente `PROVIDER_MUNICIPIOS`.
 
-### API (Apresentação)
-Responsável por expor os endpoints HTTP, configurar Swagger, mapear rotas, aplicar middleware de tratamento global de exceções e resolver dependências. O controller é enxuto e delega todo o fluxo ao service.
+### **Service**
+Centraliza toda a regra de negócio:
+- Validação da UF
+- Chamadas ao provider configurado
+- Aplicação de cache (`IMemoryCache`)
+- Paginação
+- Retorno do modelo `PagedResult<T>`
+
+### **API (Apresentação)**
+- Controllers enxutos
+- Swagger configurado
+- Middleware de tratamento global de exceções
+- Resolução de dependências via DI
+
+---
 
 ## 3. Tecnologias Utilizadas
 
-- .NET 10
-- ASP.NET Core Web API
-- HttpClient
-- IMemoryCache
-- xUnit e Moq
-- Swagger / Swashbuckle
-- Docker
-- GitHub Actions (CI)
+- .NET 10  
+- ASP.NET Core Web API  
+- HttpClient  
+- IMemoryCache  
+- xUnit, Moq  
+- Swagger / Swashbuckle  
+- Docker  
+- GitHub Actions (CI/CD)
+
+---
 
 ## 4. Endpoint Principal
 
-### Listar municípios por UF
+### **Listar municípios por UF**
 
 ```
 GET /Municipios/{uf}?page={page}&pageSize={pageSize}
@@ -60,15 +92,19 @@ GET /Municipios/{uf}?page={page}&pageSize={pageSize}
 }
 ```
 
+---
+
 ## 5. Configuração via Variáveis de Ambiente
 
-| Variável | Função | Valores permitidos |
-|---------|--------|--------------------|
-| PROVIDER_MUNICIPIOS | Define qual provider será utilizado | BRASIL_API ou IBGE |
+| Variável | Descrição | Valores permitidos |
+|---------|-----------|--------------------|
+| **PROVIDER_MUNICIPIOS** | Define qual provider será utilizado | `BRASIL_API` ou `IBGE` |
+
+---
 
 ## 6. Execução da API
 
-### Local
+### **Rodando localmente**
 
 ```
 dotnet restore
@@ -76,14 +112,24 @@ dotnet build
 dotnet run
 ```
 
-Swagger: http://localhost:5119/swagger/index.html
+Swagger disponível em:  
+➡️ **http://localhost:5119/swagger/index.html**
+
+---
 
 ## 7. Docker
 
+### **Build da imagem**
 ```
 docker build -t municipiosapi .
+```
+
+### **Executar o container**
+```
 docker run -p 5119:8080 -e PROVIDER_MUNICIPIOS=IBGE municipiosapi
 ```
+
+---
 
 ## 8. Testes
 
@@ -91,7 +137,11 @@ docker run -p 5119:8080 -e PROVIDER_MUNICIPIOS=IBGE municipiosapi
 dotnet test
 ```
 
-## 9. Estrutura
+Todos os providers, services e controllers possuem testes unitários e de integração.
+
+---
+
+## 9. Estrutura do Projeto
 
 ```
 /MunicipiosAPI
@@ -99,3 +149,11 @@ dotnet test
 /MunicipiosAPI.Providers
 /MunicipiosAPI.Service
 /MunicipiosAPI.Tests
+```
+
+---
+
+## 10. Links Úteis
+
+- **API em Produção:** https://municipioapi1-q77lvcud.b4a.run/swagger/index.html  
+- **Aplicação Web (SPA):** https://municipios-app.vercel.app
