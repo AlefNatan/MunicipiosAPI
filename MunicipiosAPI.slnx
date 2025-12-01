@@ -2,6 +2,9 @@
   <Folder Name="/Itens de Solução/">
     <File Path="docker-compose.yml" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="MunicipiosAPI.Domain/MunicipiosAPI.Domain.csproj" />
   <Project Path="MunicipiosAPI.Providers/MunicipiosAPI.Providers.csproj" />
   <Project Path="MunicipiosAPI.Service/MunicipiosAPI.Service.csproj" />
